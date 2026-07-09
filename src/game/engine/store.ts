@@ -24,7 +24,10 @@ const SAVE_KEY = 'dungeonopoly_save_v2';
 const META_KEY = 'dungeonopoly_meta_v1';
 const STEP_MS = 240;
 const ENEMY_TURN_MS = 900;
-const ANIM_MS = 500;
+/** per-animation durations matched to the sprite art */
+const ANIM_MS: Record<string, number> = {
+  idle: 0, attack: 720, skill: 1150, hurt: 550, death: 1500,
+};
 
 const delay = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
 
@@ -225,8 +228,11 @@ export const useGameStore = create<GameStore>()((set, get) => {
   const animate = async (side: 'player' | 'enemy', anim: CombatState['playerAnimation']) => {
     const key = side === 'player' ? 'playerAnimation' : 'enemyAnimation';
     set((s) => ({ combat: { ...s.combat, [key]: anim } }));
-    await delay(ANIM_MS);
-    set((s) => ({ combat: { ...s.combat, [key]: 'idle' } }));
+    await delay(ANIM_MS[anim] ?? 500);
+    // death poses stay down — everything else returns to idle
+    if (anim !== 'death') {
+      set((s) => ({ combat: { ...s.combat, [key]: 'idle' } }));
+    }
   };
 
   const damagePlayer = (amount: number) => {
