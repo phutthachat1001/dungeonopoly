@@ -3,6 +3,7 @@ import { motion, AnimatePresence, type Variants } from 'framer-motion';
 import { useGameStore } from '../../game/engine/store';
 import { getSkill } from '../../game/data/skills';
 import { StatBar } from '../UI/HUD';
+import CharacterSprite, { spriteForClass } from '../Character/CharacterSprite';
 
 // ============================================================
 // Turn-based battle screen. Emoji combatants for now —
@@ -207,9 +208,11 @@ export default function BattleScreen() {
           <motion.div
             variants={spriteVariants}
             animate={combat.playerAnimation}
-            className="text-7xl drop-shadow-[0_8px_16px_rgba(0,0,0,0.7)]"
+            className={spriteForClass(player.classId) ? '' : 'text-7xl drop-shadow-[0_8px_16px_rgba(0,0,0,0.7)]'}
           >
-            {CLASS_BATTLE_ICONS[player.classId] ?? '🧑'}
+            {spriteForClass(player.classId)
+              ? <CharacterSprite classId={player.classId} height={150} />
+              : (CLASS_BATTLE_ICONS[player.classId] ?? '🧑')}
           </motion.div>
           <div className="font-display text-2xl font-bold text-white/20">VS</div>
           <motion.div
